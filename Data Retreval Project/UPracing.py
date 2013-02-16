@@ -1,5 +1,8 @@
 ## Car Data Retreval Project
 ## Author: Todd Perry
+## Version 2.1
+## now cashes the 5 latest database entires
+
 
 
 ## Data To Be Handled:
@@ -11,8 +14,7 @@
 
 
 import time # time.sleep is required
-import sqlite3 as lite # SQLite3 required for database handling
-import sys # required for database handling
+import pymysql # localhost database handling
 
 
 class CarData:
@@ -24,23 +26,8 @@ class CarData:
     def __init__(self, dataList):
         # the class attributes are defined from the dataList list
         # use one of these variables if you only need one var, as opposed to all
-        
-        self.eventID = dataList[0]
-        self.REv = dataList[1]
-        self.gear = dataList[2]
-        self.speed = dataList[3]
-        self.FRrpm = dataList[4]
-        self.FLrpm = dataList[5]
-        self.RRrpm = dataList[6]
-        self.RLrpm = dataList[7]
-        self.GforceX = dataList[8]
-        self.GforceY = dataList[9]
-        self.airTemp = dataList[10]
-        self.throttle = dataList[11]
-        self.coolentTEMP = dataList[12]
-        self.battery = dataList[13]
-        self.batteryT = dataList[14]
-        
+
+
         self.dataList = dataList # array of all car data values, for DB
         self.nameList = ["Event ID", "REv", "Gear", "Speed",
                          "FRrpm", "FLrpm", "RRrpm", "RLrpm",
@@ -50,51 +37,41 @@ class CarData:
 
     def printOut(self):
         print("----Car Data Printout----")
-        print("Event ID: ", self.eventID)
-        print("REv: ", self.REv)
-        print("Gear: ", self.gear)
-        print("Speed: ", self.speed)
-        print("FR rpm: ", self.FRrpm)
-        print("FL rpm: ", self.FLrpm)
-        print("RR rpm: ", self.RRrpm)
-        print("RL rpm: ", self.RLrpm)
-        print("Gforce X: ", self.GforceX)
-        print("Gforce Y: ", self.GforceY)
-        print("Air Temprature: ", self.airTemp)
-        print("Throttle: ", self.throttle)
-        print("Coolent Temp: ", self.coolentTEMP)
-        print("Battery: ", self.battery)
-        print("Battery Temp: ", self.batteryT)
+        for i in range(15):
+            print(self.nameList[i] + ": " + self.dataList[i])
         print("--------------------------")
 
 
 
-        
+
 
 
 def getTextFile():
     # open the file for reading
     # the name of the file may be subject to change
-    
-    inFile = open("CarData.txt", "r")
+    try:
+        inFile = open("CarData.txt", "r")
 
-    # read the entire text file, and concat it all into one string
-    inFileText = ""
+        # read the entire text file, and concat it all into one string
+        inFileText = ""
 
-    for currentLine in inFile:
-        # cycle through inFile, line by line
-        # add the current line to inFileText
-        
-        inFileText += currentLine
+        for currentLine in inFile:
+            # cycle through inFile, line by line
+            # add the current line to inFileText
 
-        
-    # inFileText now holds all of the data from the file, however the program
-    # can easily be edited to accomidate for something different
+            inFileText += currentLine
 
-    inFile.close()
 
-    #return string for further formatting
-    return inFileText
+        # inFileText now holds all of the data from the file, however the program
+        # can easily be edited to accomidate for something different
+
+        inFile.close()
+
+        #return string for further formatting
+        return inFileText
+    except(Exception):
+        print("File Not Found")
+        return -1 #if -1 is returned, the program won't pass this stage
 
 
 
@@ -109,7 +86,7 @@ def formatRawData(rawData):
     for ch in rawData:
         # iterate through characters
 
-        
+
         if ch != ",":
 
             # only copy is ch isn't a comma
@@ -133,91 +110,119 @@ def assignVariables(dataList):
         # this following code may (almost definatley) need to be changed
         # as the sensors are different from last year
         carData = CarData(dataList)
-        # carData.printOut() OLD DEBUG
+        #carData.printOut()
 
         return carData
 
-def buildInsertQuery(nam, val):
-    # builds an INSERT query for mySQL
-    # nam = DataName, val = DataValue
+def buildInsertQuery(carData):
+    # builds an INSERT query for SQL
 
-    
-    dataToAdd = "('" + str(nam) + "', " + str(val) + ")"
-    # data to insert
+
+    dataToAdd = "("
+
+    for i in range(15): # loop through sensor data
+        dataToAdd += "'" +  str(carData.dataList[i]) + "'"
+        if i != 14:
+            dataToAdd += ", "
+
+    dataToAdd += ")"
 
     # next step: build the full query & return it
 
-    query = "INSERT INTO CarData VALUES" + dataToAdd    
+    query = "INSERT INTO CarStats VALUES" + dataToAdd
+
+    #print(query)
+
 
     return query
-        
-        
 
 
 
-    
-    
 
-    
+
 
 def writeToDatabase(carData):
     # this function interprets the CarData object, and commits it to the
-    # database 'URP.db'
-
+    # database 'UPR'
     try:
-        con = lite.connect('UPR.db')
+        conn = pymysql.connect(host='127.0.0.1', port=3306, user='root', passwd='', db='upr')
+        cur = conn.cursor()
 
-        cur = con.cursor()  
+        #cur.execute("DELETE FROM CarStats") #remove current data (QUOTED OUT SO DATA CASHES)
 
-        # text dataName = eventID, REv, gear,  ..... , batteryT
-        # text dataValue = , 5, 2, 6, 54, 7, ...., ???
-        # text to accomodate for floats & othger unexpected
-        # can be processed w/ javascript client side
-        
-        #cur.executescript("DROP TABLE IF EXISTS CarData")
-        # wipe current database state
+        query = buildInsertQuery(carData)
 
-        #cur.executescript("CREATE TABLE CarData(DataName TEXT, DataValue TEXT)")
-        # create clean database
+        cur.execute(query) #add new data
 
-        cur.executescript("DELETE FROM CarData")
-
-        
-        for index in range(15): # 15 = number of sensors
-            query = buildInsertQuery(carData.nameList[index], carData.dataList[index]) # get query
-            cur.executescript(query) # execute
-        
+        conn.commit()
 
 
+        cur.close()
+        conn.close()
 
-
-        
-        
         print("Write To UPR.db Successful")
 
-        con.commit()
-    
     except (Exception):
-        
+
         print("Something Went Wrong. (Failed To Write To Database Successfully)")
-        
-    finally:
-        
-        if con:
-            con.close() 
+
+def databaseSetup():
+    try:
+        conn = pymysql.connect(host='127.0.0.1', port=3306, user='root', passwd='', db='upr')
+        cur = conn.cursor()
+
+        cur.execute("CREATE DATABASE IF NOT EXISTS UPR")
+
+        cur.execute("DROP TABLE IF EXISTS CarStats")
+        cur.execute("CREATE TABLE IF NOT EXISTS CarStats(" +
+                    "EventID varChar(50), Rev varChar(50), Gear varChar(50), " +
+                    "Speed varChar(50), FRrpm varChar(50), FLrpm varChar(50), " +
+                    "RRrp varChar(50), RLrpm varChar(50), GForceX varChar(50), " +
+                    "GForceY varChar(50), AirTemp varChar(50), Throttle varChar(50), " +
+                    "CoolentTemp varChar(50), Battery varChar(50), BatteryTemp varChar(50)" +
+                    ")") #SQL query for table setup
+
+        print("Database Reset Successful")
+
+        cur.close()
+        conn.close()
+    except (Exception):
+        print("Database Did Not Reset, Something Went Wrong")
 
 
-def main():
+def run():
     while True:
-        rawData = getTextFile()
+        rawData = -1 # init rawData
+        while rawData == -1: # prevents crash after file not found error
+            rawData = getTextFile()
         dataList = formatRawData(rawData)
         carData = assignVariables(dataList)
         writeToDatabase(carData)
-        time.sleep(0.3) #delay between operations, can be changed
-    
+        time.sleep(0.2)
 
+# the cycle of operations:
+    # get new sensor data
+    # format that data
+    # prepare for database write
+    # write to database
+    # repeat (delay between operations can be changed)
 
+def menu():
+      canLoop = True
+      while canLoop == True:
+          print("press 1 to set up database")
+          print("press 2 to begin uploading to database")
+          print("press 3 to exit")
+          choice = eval(input(">>>"))
+          if choice == 1:
+              databaseSetup()
+          elif choice == 2:
+              run()
+          elif choice == 3:
+              canLoop = False
 
+def main():
+    menu()
 
 main()
 
