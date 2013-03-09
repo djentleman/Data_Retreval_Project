@@ -1,16 +1,34 @@
 ## Car Data Retreval Project
 ## Author: Todd Perry
-## Version 2.1
-## now cashes the 5 latest database entires
+## Version 2.3
+## new sensors are here!
+## now with added bug fixes
 
 
 
-## Data To Be Handled:
-## eventID,REv,gear,speed,FRrpm,FLrpm,
-## RRrpm,RLrpm,GforseX,GforseY,airtemp,
-## throttle,coolentTEMP,battery,batteryt
+##EventID
+##Rev TEXT,
+##Gear TEXT,
+##Speed TEXT,
+##RPM TEXT,
+##FRrpm TEXT,
+##FLrpm TEXT,
+##RRrpm TEXT,
+##RLrpm TEXT,
+##Suspension1 TEXT,
+##Suspension2 TEXT,
+##Suspension3 TEXT,
+##Suspension4 TEXT,
+##GforceX TEXT,
+##GforceY TEXT,
+##AirTemp TEXT,
+##Throttle TEXT,
+##CoolentTemp TEXT,
+##Battery TEXT,
+##BatteryTemp TEXT,
+##Lambda TEXT
 
-## 15 pieces of data
+## 21 pieces of data
 
 
 import time # time.sleep is required
@@ -29,15 +47,15 @@ class CarData:
 
 
         self.dataList = dataList # array of all car data values, for DB
-        self.nameList = ["Event ID", "REv", "Gear", "Speed",
-                         "FRrpm", "FLrpm", "RRrpm", "RLrpm",
-                         "G-Force X", "G-Force Y", "Air Temp",
-                         "Throttle", "Coolent Temp", "Battery",
-                         "Battery Temp"] # array of all data names, for DB
+        self.nameList = ["Event ID", "Rev", "Gear", "Speed", "RPM", "Front Right RPM",
+                        "Front Left RPM", "Rear Right RPM", "Rear Left RPM", "Suspension 1",
+                        "Suspension 2", "Suspension 3", "Suspension 4", "G Force X", "G Force Y",
+                        "Air Temprature", "Throttle", "Coolent Temprature", "Battery",
+                        "Battery Temprature", "Lambda"] # array of all data names, for Printout
 
     def printOut(self):
         print("----Car Data Printout----")
-        for i in range(15):
+        for i in range(21):
             print(self.nameList[i] + ": " + self.dataList[i])
         print("--------------------------")
 
@@ -101,9 +119,9 @@ def formatRawData(rawData):
 
 def assignVariables(dataList):
     # dataList should be 15 items long, if not something has gone wrong
-    # 15 is subject to change, depending on the number of sensors
+    # 21 is subject to change, depending on the number of sensors
 
-    if len(dataList) != 15:
+    if len(dataList) != 21:
         print("Something Went Wrong. (Text File Wasn't Fully Populated)")
     else:
         # everything is going as planned
@@ -120,9 +138,9 @@ def buildInsertQuery(carData):
 
     dataToAdd = "("
 
-    for i in range(15): # loop through sensor data
+    for i in range(21): # loop through sensor data
         dataToAdd += "'" +  str(carData.dataList[i]) + "'"
-        if i != 14:
+        if i != 20:
             dataToAdd += ", "
 
     dataToAdd += ")"
@@ -145,12 +163,14 @@ def writeToDatabase(carData):
     # this function interprets the CarData object, and commits it to the
     # database 'UPR'
     try:
-        conn = pymysql.connect(host='127.0.0.1', port=3306, user='root', passwd='', db='upr')
+        conn = pymysql.connect(host='127.0.0.1', port=3306, user='root', passwd='', db='upStatsAPP')
         cur = conn.cursor()
 
-        #cur.execute("DELETE FROM CarStats") #remove current data (QUOTED OUT SO DATA CASHES)
+        cur.execute("DELETE FROM CarStats") #remove current data
 
         query = buildInsertQuery(carData)
+
+        #print(query)
 
         cur.execute(query) #add new data
 
@@ -160,7 +180,7 @@ def writeToDatabase(carData):
         cur.close()
         conn.close()
 
-        print("Write To UPR.db Successful")
+        print("Write To upStatsAPP.db Successful")
 
     except (Exception):
 
@@ -168,19 +188,27 @@ def writeToDatabase(carData):
 
 def databaseSetup():
     try:
-        conn = pymysql.connect(host='127.0.0.1', port=3306, user='root', passwd='', db='upr')
+        conn = pymysql.connect(host='127.0.0.1', port=3306, user='root', passwd='', db='test') # test DEFINATLEY exists
         cur = conn.cursor()
 
-        cur.execute("CREATE DATABASE IF NOT EXISTS UPR")
+        cur.execute("CREATE DATABASE IF NOT EXISTS upStatsAPP") # DB name is now upStatsAPP
+
+        cur.close()
+        conn.close() # close test
+
+        conn = pymysql.connect(host='127.0.0.1', port=3306, user='root', passwd='', db='upStatsAPP') # test DEFINATLEY exists
+        cur = conn.cursor() # open the 'newly created' upStatsAPP
+
 
         cur.execute("DROP TABLE IF EXISTS CarStats")
         cur.execute("CREATE TABLE IF NOT EXISTS CarStats(" +
-                    "EventID varChar(50), Rev varChar(50), Gear varChar(50), " +
-                    "Speed varChar(50), FRrpm varChar(50), FLrpm varChar(50), " +
-                    "RRrp varChar(50), RLrpm varChar(50), GForceX varChar(50), " +
-                    "GForceY varChar(50), AirTemp varChar(50), Throttle varChar(50), " +
-                    "CoolentTemp varChar(50), Battery varChar(50), BatteryTemp varChar(50)" +
-                    ")") #SQL query for table setup
+                    "EventID TEXT, Rev TEXT, Gear TEXT, RPM TEXT, " +
+                    "Speed TEXT,  FRrpm TEXT, FLrpm TEXT, " +
+                    "RRrp TEXT, RLrpm TEXT, Suspension1 TEXT, " +
+                    "Suspension2 TEXT, Suspension3 TEXT, Suspension4 TEXT, GForceX TEXT, " +
+                    "GForceY TEXT, AirTemp TEXT, Throttle TEXT, " +
+                    "CoolentTemp TEXT, Battery TEXT, BatteryTemp TEXT, " +
+                    "Lambda TEXT)") #SQL query for table setup
 
         print("Database Reset Successful")
 
@@ -197,8 +225,9 @@ def run():
             rawData = getTextFile()
         dataList = formatRawData(rawData)
         carData = assignVariables(dataList)
+        #carData.printOut() # for debug
         writeToDatabase(carData)
-        time.sleep(0.2)
+        time.sleep(0.2) # wait time
 
 # the cycle of operations:
     # get new sensor data
@@ -221,7 +250,22 @@ def menu():
           elif choice == 3:
               canLoop = False
 
+def dumpSystemInfo():
+    print("#############################")
+    print("#          UPracing         #")
+    print("# Car Data Retreval Project #")
+    print("#     Author: Todd Perry    #")
+    print("#        Version 2.3        #")
+    print("#############################")
+    print("")
+    print("NEW SENSORS ARE HERE!")
+    print("NOW WITH ADDED BUGFIXES!!")
+    print("")
+    print("")
+
+
 def main():
+    dumpSystemInfo()
     menu()
 
 main()
