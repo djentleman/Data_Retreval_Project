@@ -2,7 +2,7 @@
 ## Author: Todd Perry
 ## Version 2.3
 ## new sensors are here!
-## now with added bug fixes
+## now with advanced data casheing
 
 
 
@@ -34,6 +34,79 @@
 import time # time.sleep is required
 import pymysql # localhost database handling
 
+class dataCashe:
+    # the dataCashe aggregates carData, and contains an array of current data
+    # has a print method
+
+    def __init__(self):
+        # dataCashe contains an arrat of carData, with a maximum size of 5
+
+        self.currentData = [] # the array (initializes empty)
+
+        # the cashe is the only attribute
+
+
+    def printOut(self):
+        # Iterates through the cashe, prints all
+        if len(self.currentData) <= 0:
+            print("No Data In Cashe")
+        else:
+            for index in range(len(self.currentData)):
+                print("Car Data Object: " + index) #title
+                print() # new line
+                self.currentData[index].printOut()
+        
+
+    def addData(self, dataToAdd):
+        # adds a new CarData to the cashe, dataToAdd is of type CarData
+        # 0 is newest item, 4 is oldest item
+
+        if len(self.currentData) < 5:
+            # len is less than 5
+            # increment everything by one
+            # input new data in pos 0
+            
+            for index in range(len(self.currentData) + 1, 0, -1):
+                # start at len + 1, end at 0
+                # len + 1 (we are actually adding data here)
+                self.currentData[index] = self.currentData[index - 1] # shift
+
+            self.currentData[0] = dataToAdd # add new data in index 0
+        else:
+            # len is 5
+            for index in range(len(self.currentData), 0, -1):
+                # start at len, end at 0
+                # doesn't grow
+                self.currentData[index] = self.currentData[index - 1] # shift
+                    
+            
+    def writeToDatabase(self):
+        # writes all of the data to the database
+        try:
+            conn = pymysql.connect(host='127.0.0.1', port=3306, user='root', passwd='', db='upStatsAPP')
+            cur = conn.cursor()
+
+            cur.execute("DELETE FROM CarStats") #remove current data
+
+            for index in range(len(self.currentData)):
+                query = buildInsertQuery(self.currentData[index]) # cycle through cashe
+                cur.execute(query) #add new data
+
+            conn.commit()
+
+
+            cur.close()
+            conn.close()
+
+            print("Write To upStatsAPP.db Successful")
+
+        except (Exception):
+
+            print("Something Went Wrong. (Failed To Write To Database Successfully)")
+            menu()
+        
+                
+           
 
 class CarData:
     # the CarData class holds all the relevant data
@@ -161,7 +234,7 @@ def buildInsertQuery(carData):
 
 def writeToDatabase(carData):
     # this function interprets the CarData object, and commits it to the
-    # database 'UPR'
+    # database 'upStatsAPP'
     try:
         conn = pymysql.connect(host='127.0.0.1', port=3306, user='root', passwd='', db='upStatsAPP')
         cur = conn.cursor()
