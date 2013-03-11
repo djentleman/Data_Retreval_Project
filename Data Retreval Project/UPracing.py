@@ -1,6 +1,6 @@
 ## Car Data Retreval Project
 ## Author: Todd Perry
-## Version 2.3
+## Version 2.4
 ## new sensors are here!
 ## now with advanced data casheing
 
@@ -34,14 +34,16 @@
 import time # time.sleep is required
 import pymysql # localhost database handling
 
-class dataCashe:
+class DataCashe:
     # the dataCashe aggregates carData, and contains an array of current data
     # has a print method
 
     def __init__(self):
         # dataCashe contains an arrat of carData, with a maximum size of 5
 
-        self.currentData = [] # the array (initializes empty)
+        blankCarData = CarData([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+
+        self.currentData = [blankCarData, blankCarData, blankCarData, blankCarData, blankCarData] # the array (initializes empty)
 
         # the cashe is the only attribute
 
@@ -52,7 +54,7 @@ class dataCashe:
             print("No Data In Cashe")
         else:
             for index in range(len(self.currentData)):
-                print("Car Data Object: " + index) #title
+                print("Car Data Object: " + str(index)) #title
                 print() # new line
                 self.currentData[index].printOut()
         
@@ -61,23 +63,15 @@ class dataCashe:
         # adds a new CarData to the cashe, dataToAdd is of type CarData
         # 0 is newest item, 4 is oldest item
 
-        if len(self.currentData) < 5:
-            # len is less than 5
-            # increment everything by one
-            # input new data in pos 0
-            
-            for index in range(len(self.currentData) + 1, 0, -1):
-                # start at len + 1, end at 0
-                # len + 1 (we are actually adding data here)
-                self.currentData[index] = self.currentData[index - 1] # shift
 
-            self.currentData[0] = dataToAdd # add new data in index 0
-        else:
-            # len is 5
-            for index in range(len(self.currentData), 0, -1):
-                # start at len, end at 0
-                # doesn't grow
-                self.currentData[index] = self.currentData[index - 1] # shift
+
+        for index in range(len(self.currentData) - 1, 0, -1):
+            # start at len, end at 0
+            # doesn't grow
+            self.currentData[index] = self.currentData[index - 1] # shift up
+
+        self.currentData[0] = dataToAdd
+            
                     
             
     def writeToDatabase(self):
@@ -129,7 +123,7 @@ class CarData:
     def printOut(self):
         print("----Car Data Printout----")
         for i in range(21):
-            print(self.nameList[i] + ": " + self.dataList[i])
+            print(str(self.nameList[i]) + ": " + str(self.dataList[i]))
         print("--------------------------")
 
 
@@ -229,36 +223,6 @@ def buildInsertQuery(carData):
 
 
 
-
-
-
-def writeToDatabase(carData):
-    # this function interprets the CarData object, and commits it to the
-    # database 'upStatsAPP'
-    try:
-        conn = pymysql.connect(host='127.0.0.1', port=3306, user='root', passwd='', db='upStatsAPP')
-        cur = conn.cursor()
-
-        cur.execute("DELETE FROM CarStats") #remove current data
-
-        query = buildInsertQuery(carData)
-
-        #print(query)
-
-        cur.execute(query) #add new data
-
-        conn.commit()
-
-
-        cur.close()
-        conn.close()
-
-        print("Write To upStatsAPP.db Successful")
-
-    except (Exception):
-
-        print("Something Went Wrong. (Failed To Write To Database Successfully)")
-
 def databaseSetup():
     try:
         conn = pymysql.connect(host='127.0.0.1', port=3306, user='root', passwd='', db='test') # test DEFINATLEY exists
@@ -292,14 +256,15 @@ def databaseSetup():
 
 
 def run():
+    dataCashe = DataCashe()
     while True:
         rawData = -1 # init rawData
         while rawData == -1: # prevents crash after file not found error
             rawData = getTextFile()
         dataList = formatRawData(rawData)
         carData = assignVariables(dataList)
-        #carData.printOut() # for debug
-        writeToDatabase(carData)
+        dataCashe.addData(carData)
+        dataCashe.writeToDatabase()
         time.sleep(0.2) # wait time
 
 # the cycle of operations:
@@ -328,11 +293,11 @@ def dumpSystemInfo():
     print("#          UPracing         #")
     print("# Car Data Retreval Project #")
     print("#     Author: Todd Perry    #")
-    print("#        Version 2.3        #")
+    print("#        Version 2.4        #")
     print("#############################")
     print("")
     print("NEW SENSORS ARE HERE!")
-    print("NOW WITH ADDED BUGFIXES!!")
+    print("NOW WITH AN ADVANCED DATA CASHE!!")
     print("")
     print("")
 
