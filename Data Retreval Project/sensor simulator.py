@@ -9,7 +9,7 @@ import time
 def getStringToWrite():
     # init random number generator
     toWrite = ""
-    for i in range(15):
+    for i in range(21):
         rand = random.randint(1, 100)
         toWrite = toWrite + str(rand) + ", "
     print(toWrite)
