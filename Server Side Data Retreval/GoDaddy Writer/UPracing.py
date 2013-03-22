@@ -40,11 +40,13 @@ class DataCashe:
     # has a print method
 
     def __init__(self):
-        # dataCashe contains an arrat of carData, with a maximum size of 5
+        # dataCashe contains an arrat of carData, with a maximum size of 8
 
         blankCarData = CarData([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
-        self.currentData = [blankCarData, blankCarData, blankCarData, blankCarData, blankCarData] # the array (initializes empty)
+        self.currentData = [blankCarData, blankCarData, blankCarData,
+                            blankCarData, blankCarData, blankCarData,
+                            blankCarData, blankCarData] # the array (initializes empty)
 
         # the cashe is the only attribute
 
@@ -263,7 +265,7 @@ def run():
         carData = assignVariables(dataList)
         dataCashe.addData(carData)
         dataCashe.writeToDatabase()
-        time.sleep(0.2) # wait time
+        #  time.sleep(0.2) # wait time
 
 # the cycle of operations:
     # get new sensor data
