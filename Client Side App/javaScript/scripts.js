@@ -166,7 +166,7 @@ var lineCounter = 0;
 	addToGraphs();
 	changeOnPageStats();
 	if(!stopGen) {
-       genTimer = setTimeout(function(){generation()},500)
+       genTimer = setTimeout(function(){generation()},1000)
 	}
 	}	
 
