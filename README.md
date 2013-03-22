@@ -7,7 +7,8 @@ Client/Server Code For The UPRacing Stats App
 
 Author: Craig Wilson
 
-WRITE SOMETHING HERE CRAIG!
+Server to client side: The programs uses the data from the server to generate real time stats and 
+graphs which the user can choose which data they want.
 
 ##Server Side Data Retreval
 
