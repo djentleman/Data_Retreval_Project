@@ -1,6 +1,6 @@
 ## Car Data Retreval Project
 ## Author: Todd Perry
-## Version 2.4.1
+## Version 2.4.2
 ## new sensors are here!
 ## now with advanced data casheing
 ## writes to goDaddy
@@ -294,11 +294,11 @@ def dumpSystemInfo():
     print("#          UPracing         #")
     print("# Car Data Retreval Project #")
     print("#     Author: Todd Perry    #")
-    print("#       Version 2.4.1       #")
+    print("#       Version 2.4.2       #")
     print("#############################")
     print("")
     print("NEW SENSORS ARE HERE!")
-    print("NOW WITH AN ADVANCED DATA CASHE!!")
+    print("MORE CASHES FOR LESS LAG (WOO!)!!")
     print("NOW WRITES TO GODADDY!!")
     print("")
     print("")
