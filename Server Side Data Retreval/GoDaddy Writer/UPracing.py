@@ -1,9 +1,9 @@
 ## Car Data Retreval Project
 ## Author: Todd Perry
-## Version 2.4.2
+## Version 2.4.3
 ## new sensors are here!
-## now with advanced data casheing
-## writes to goDaddy
+## lots of threads!
+## writes to goDaddy!
 
 
 
@@ -34,13 +34,40 @@
 
 import time # time.sleep is required
 import pymysql # localhost database handling
+from threading import *
 
-class DataCashe:
-    # the dataCashe aggregates carData, and contains an array of current data
+s = Semaphore() # global semaphore for concurrent parts
+
+class WriterThread(Thread): # thread represented as an object
+    # the idea is, if any thread takes longer to process than any other
+    # thread in the system, it will switch, speeding up with process
+    # and removing any gaps from uploading
+    def __init__(self, name):
+        Thread.__init__(self)
+        self.name = name # name to distuinguish between in thread uploading
+        
+    def run(self):
+        global s
+        s.acquire()
+        print("Thread", self.name, "Has Optimized For Uploading")
+        s.release()
+        while True:
+            s.acquire()
+            # critical section
+            print("Thread", self.name, "Has Uploaded")
+            runWriter()
+            s.release()
+            time.sleep(0) # gives the cpu a break so other threads
+            # get involved, and this program gets more control over
+            # the program counter -> faster
+        return
+
+class DataCache:
+    # the dataCache aggregates carData, and contains an array of current data
     # has a print method
 
     def __init__(self):
-        # dataCashe contains an arrat of carData, with a maximum size of 8
+        # dataCache contains an arrat of carData, with a maximum size of 8
 
         blankCarData = CarData([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
 
@@ -94,7 +121,7 @@ class DataCashe:
             cur.close()
             conn.close()
 
-            print("Write To upStatsAPP.db Successful")
+            #print("Write To upStatsAPP.db Successful")
 
         except (Exception):
 
@@ -255,17 +282,15 @@ def databaseSetup():
         print("Database Did Not Reset, Something Went Wrong")
 
 
-def run():
-    dataCashe = DataCashe()
-    while True:
-        rawData = -1 # init rawData
-        while rawData == -1: # prevents crash after file not found error
-            rawData = getTextFile()
-        dataList = formatRawData(rawData)
-        carData = assignVariables(dataList)
-        dataCashe.addData(carData)
-        dataCashe.writeToDatabase()
-        #  time.sleep(0.2) # wait time
+def runWriter():
+    dataCache = DataCache()
+    rawData = -1 # init rawData
+    while rawData == -1: # prevents crash after file not found error
+        rawData = getTextFile()
+    dataList = formatRawData(rawData)
+    carData = assignVariables(dataList)
+    dataCache.addData(carData)
+    dataCache.writeToDatabase()
 
 # the cycle of operations:
     # get new sensor data
@@ -274,9 +299,23 @@ def run():
     # write to database
     # repeat (delay between operations can be changed)
 
+def mkThreads():
+    
+    t1 = WriterThread("A")
+    t2 = WriterThread("B")
+    t3 = WriterThread("C")
+    t4 = WriterThread("D")
+    t5 = WriterThread("E")
+    t6 = WriterThread("F")
+    t1.start()
+    t2.start()
+    t3.start()
+    t4.start()
+    t5.start()
+    t6.start()
+
 def menu():
-      canLoop = True
-      while canLoop == True:
+      while True:
           print("press 1 to set up database")
           print("press 2 to begin uploading to database")
           print("press 3 to exit")
@@ -284,21 +323,21 @@ def menu():
           if choice == 1:
               databaseSetup()
           elif choice == 2:
-              run()
+              mkThreads()
+              break
           elif choice == 3:
-              canLoop = False
-      exit()
+              exit()
 
 def dumpSystemInfo():
     print("#############################")
     print("#          UPracing         #")
     print("# Car Data Retreval Project #")
     print("#     Author: Todd Perry    #")
-    print("#       Version 2.4.2       #")
+    print("#       Version 2.4.3       #")
     print("#############################")
     print("")
     print("NEW SENSORS ARE HERE!")
-    print("MORE CASHES FOR LESS LAG (WOO!)!!")
+    print("NOW WITH LOTS OF THREADS")
     print("NOW WRITES TO GODADDY!!")
     print("")
     print("")
