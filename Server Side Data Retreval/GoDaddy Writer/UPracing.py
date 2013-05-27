@@ -55,8 +55,8 @@ class WriterThread(Thread): # thread represented as an object
             s.acquire()
             # critical section
             print("Thread", self.name, "Has Uploaded")
-            runWriter()
             s.release()
+            runWriter()
             time.sleep(0) # gives the cpu a break so other threads
             # get involved, and this program gets more control over
             # the program counter -> faster
@@ -107,6 +107,7 @@ class DataCache:
     def writeToDatabase(self):
         # writes all of the data to the database
         try:
+            s.acquire()
             conn = pymysql.connect(host='upStatsAPPV2.db.9980564.hostedresource.com', port=3306, user='upStatsAPPV2', passwd='Southsea2#', db='upStatsAPPV2')
             cur = conn.cursor()
 
@@ -122,11 +123,10 @@ class DataCache:
             conn.close()
 
             #print("Write To upStatsAPP.db Successful")
-
         except (Exception):
-
             print("Something Went Wrong. (Failed To Write To Database Successfully)")
 
+        s.release()
 
 
 
