@@ -1,6 +1,6 @@
 ## Car Data Retreval Project
 ## Author: Todd Perry
-## Version 2.4.3
+## Version 2.4.4
 ## new sensors are here!
 ## lots of threads!
 ## writes to goDaddy!
@@ -337,7 +337,7 @@ def dumpSystemInfo():
     print("#          UPracing         #")
     print("# Car Data Retreval Project #")
     print("#     Author: Todd Perry    #")
-    print("#       Version 2.4.3       #")
+    print("#       Version 2.4.4       #")
     print("#############################")
     print("")
     print("NEW SENSORS ARE HERE!")
@@ -360,4 +360,3 @@ def main():
     menu(fileName)
 
 main()
-
