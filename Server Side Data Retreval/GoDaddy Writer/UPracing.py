@@ -42,8 +42,9 @@ class WriterThread(Thread): # thread represented as an object
     # the idea is, if any thread takes longer to process than any other
     # thread in the system, it will switch, speeding up with process
     # and removing any gaps from uploading
-    def __init__(self, name):
+    def __init__(self, name, fileName):
         Thread.__init__(self)
+        self.fileName = fileName # where the thread will get data from
         self.name = name # name to distuinguish between in thread uploading
         
     def run(self):
@@ -56,7 +57,9 @@ class WriterThread(Thread): # thread represented as an object
             # critical section
             print("Thread", self.name, "Has Uploaded")
             s.release()
-            runWriter()
+            crashFlag = runWriter(self.fileName)
+            if crashFlag:
+                return
             time.sleep(0) # gives the cpu a break so other threads
             # get involved, and this program gets more control over
             # the program counter -> faster
@@ -158,11 +161,11 @@ class CarData:
 
 
 
-def getTextFile():
+def getTextFile(fileName):
     # open the file for reading
     # the name of the file may be subject to change
     try:
-        inFile = open("CarData.txt", "r")
+        inFile = open(fileName, "r")
 
         # read the entire text file, and concat it all into one string
         inFileText = ""
@@ -282,15 +285,16 @@ def databaseSetup():
         print("Database Did Not Reset, Something Went Wrong")
 
 
-def runWriter():
+def runWriter(fileName):
     dataCache = DataCache()
-    rawData = -1 # init rawData
-    while rawData == -1: # prevents crash after file not found error
-        rawData = getTextFile()
+    rawData = getTextFile(fileName)
+    if rawData == -1:
+        return True # prevents crash after file not found error, false is crash flag
     dataList = formatRawData(rawData)
     carData = assignVariables(dataList)
     dataCache.addData(carData)
     dataCache.writeToDatabase()
+    return False # crash flag is false
 
 # the cycle of operations:
     # get new sensor data
@@ -299,14 +303,14 @@ def runWriter():
     # write to database
     # repeat (delay between operations can be changed)
 
-def mkThreads():
+def mkThreads(fileName):
     
-    t1 = WriterThread("A")
-    t2 = WriterThread("B")
-    t3 = WriterThread("C")
-    t4 = WriterThread("D")
-    t5 = WriterThread("E")
-    t6 = WriterThread("F")
+    t1 = WriterThread("A", fileName)
+    t2 = WriterThread("B", fileName)
+    t3 = WriterThread("C", fileName)
+    t4 = WriterThread("D", fileName)
+    t5 = WriterThread("E", fileName)
+    t6 = WriterThread("F", fileName)
     t1.start()
     t2.start()
     t3.start()
@@ -314,7 +318,7 @@ def mkThreads():
     t5.start()
     t6.start()
 
-def menu():
+def menu(fileName):
       while True:
           print("press 1 to set up database")
           print("press 2 to begin uploading to database")
@@ -323,7 +327,7 @@ def menu():
           if choice == 1:
               databaseSetup()
           elif choice == 2:
-              mkThreads()
+              mkThreads(fileName)
               break
           elif choice == 3:
               exit()
@@ -342,10 +346,18 @@ def dumpSystemInfo():
     print("")
     print("")
 
+def getFileName():
+    print("Enter The File Name Of The Serial Inputs:")
+    fileName = input(">>>")
+    ## possible regular expression check here
+    return fileName
+
 
 def main():
     dumpSystemInfo()
-    menu()
+    fileName = getFileName()
+    print("Extracting and pushing data from", fileName)
+    menu(fileName)
 
 main()
 
