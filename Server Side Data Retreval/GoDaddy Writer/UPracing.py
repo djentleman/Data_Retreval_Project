@@ -304,7 +304,6 @@ def runWriter(fileName):
     # repeat (delay between operations can be changed)
 
 def mkThreads(fileName):
-    
     t1 = WriterThread("A", fileName)
     t2 = WriterThread("B", fileName)
     t3 = WriterThread("C", fileName)
@@ -317,6 +316,32 @@ def mkThreads(fileName):
     t4.start()
     t5.start()
     t6.start()
+    # main thread works as interrupt handler
+    threads = [t1, t2, t3, t4, t5, t6]
+    waitForInterrupt(threads)
+
+def threadsAlive(threads):
+    # check all threads, if any are alive - return true, else false
+    alive = False
+    for current in threads: # inner loop
+        alive = alive or current.isAlive() # all threads must be dead
+    return alive
+
+def waitForInterrupt(threads):
+    global s
+    # waits for interrupt - then closes all threads
+    while True: # outer loop
+        # this has O(n^2) efficency, slows down other threads
+        # to save on cpu use, checks occur every 5 seconds
+        time.sleep(5)# timeout on outer loop
+        if threadsAlive(threads) == False:
+            print("All Threads Dead")
+            break
+        s.acquire()
+        print("Threads Are Alive")
+        s.release()
+    main()
+    return
 
 def menu(fileName):
       while True:
