@@ -74,15 +74,38 @@ var lineCounter = 0;
       
 	  // When the page first loads it creates the graph
       google.setOnLoadCallback(drawVisualization);
-	
+	  
+//MY RANDOM TEST FUNCTION
  function test(){
 	//  alert("bpob");
 	  }
-	
- function drawChart() {
-	 //redraws the bars with new data
-      chart.draw(data, options);
-    }
+
+//WORKS OUT WHAT TO CALL AND DO  
+ function main(){
+		//if a race is on
+		if (isRaceOn() == true){
+				//updates the stats 
+				getAllStats();
+		if (currentStats.length != 0){
+				//gets the graph data
+				getGraphData();
+				drawChart();
+		}
+			
+		}
+		else {
+			alert("Their appears to be no race on");
+		}
+	}
+	  
+	  
+	  
+//REDRAWS THE CHART
+	function drawChart() {
+	 
+		// chart =  new google.visualization.LineChart(document.getElementById('visualization'));
+		chart.draw(data, options);
+		}
 	
 //COMPARES THE TIME OF THE LAST TWO QUERIES TO SEE IF A RACE IS ON
     function isRaceOn(){
@@ -102,8 +125,8 @@ var lineCounter = 0;
 	function isRaceOnAjax(){
 		$.ajax({
 		url: "../v1.0/php/isRaceOn.php",
+		async: false,
 		success: function( data ) {
-			alert(data);
 			return data;
 		}
 		})
@@ -165,8 +188,13 @@ var lineCounter = 0;
 			queryString += ("&stat" + (i + 1) + "=" + currentStats[i]);
 			}
 		}
+		else {
+			//if no lines on graph go to default
+			drawVisualization(); 
+		}
 	
-	alert (queryString);
+	//alert (queryString);
+	
 	}
 	
 	
@@ -190,6 +218,8 @@ var lineCounter = 0;
 		}).responseText;
 	//Converts the JSON object into useful graph data
     data = new google.visualization.DataTable(jsonData);
+	
+	drawChart();
 	 
 	 }}
 	

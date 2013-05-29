@@ -94,6 +94,8 @@ $time = 1;
 
 		
 		$JSONdata .= "]},";
+		
+		$time = $time + 1;
 	}
 
 	
