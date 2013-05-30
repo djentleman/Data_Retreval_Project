@@ -111,7 +111,7 @@ class DataCache:
         # writes all of the data to the database
         try:
             s.acquire()
-            conn = pymysql.connect(host='upStatsAPPV2.db.9980564.hostedresource.com', port=3306, user='upStatsAPPV2', passwd='Southsea2#', db='upStatsAPPV2')
+            conn = pymysql.connect(host='upStatsAppV3.db.9980564.hostedresource.com', port=3306, user='upStatsAppV3', passwd='Southsea3#', db='upStatsAppV3')
             cur = conn.cursor()
 
             cur.execute("DELETE FROM carStats") #remove current data
@@ -125,7 +125,7 @@ class DataCache:
             cur.close()
             conn.close()
 
-            #print("Write To upStatsAPP.db Successful")
+            print("Write To upStatsAPP.db Successful")
         except (Exception):
             print("Something Went Wrong. (Failed To Write To Database Successfully)")
 
@@ -334,7 +334,7 @@ def waitForInterrupt(threads):
         # this has O(n^2) efficency, slows down other threads
         # to save on cpu use, checks occur every 5 seconds
         time.sleep(5)# timeout on outer loop
-        if threadsAlive(threads) == False:
+        if threadsAlive(threads) == False: ## if threads are dead OR user interrupt
             print("All Threads Dead")
             break
         s.acquire()
