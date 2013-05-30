@@ -9,13 +9,17 @@ if yes: starts to display real time stats
 google.load('visualization', '1', {packages: ['corechart']}); // Load graph
 //need to check few of these
 // basic graph variables
-var data;
+var graphData;
 var chart;
 var options;
 var jsonData;
 var queryString;
 
+//array for the current stats selected to be repesented on the graph
 var currentStats = new Array();
+//array for the top six stats in the top selection 
+var topSixStats = new Array();
+var allStats = false;
 
 
 
@@ -36,10 +40,10 @@ var lineCounter = 0;
 // this gets called when the page first loads
  function drawVisualization() {
 		//default graph as an exampe; for when there is no data running ie the car not in race
-		data = new google.visualization.DataTable();
-		data.addColumn('string', 'Example Time'); 
-		data.addColumn('number', 'Example Speed(sec)'); 
-		data.addRows([
+		graphData = new google.visualization.DataTable();
+		graphData.addColumn('string', 'Example Time'); 
+		graphData.addColumn('number', 'Example Speed(sec)'); 
+		graphData.addRows([
 		['56',32],
 		['57', 46],
 		['58',  63],
@@ -69,7 +73,7 @@ var lineCounter = 0;
 	  
         // Create the graph
        chart =  new google.visualization.LineChart(document.getElementById('visualization'));
-       chart.draw(data, options);
+       chart.draw(graphData, options);
       }
       
 	  // When the page first loads it creates the graph
@@ -82,21 +86,49 @@ var lineCounter = 0;
 
 //WORKS OUT WHAT TO CALL AND DO  
  function main(){
+		//puts the top six stats into an array
+		addTopSixStats();
 		//if a race is on
-		if (isRaceOn() == true){
-				//updates the stats 
-				getAllStats();
+		if(isRaceOn() == true){
+		generation();
+			
+		}
+		else if (isRaceOn() != true){
+			alert("Their appears to be no race on currently");
+			drawVisualization();
+		}
+	}
+	
+//LOOPS THROUGH EACH STAGE
+	var genTimer;
+	var stopGen = 0; 
+	var counter = 0;
+	function generation() {
+	clearTimeout(genTimer)  //stop additional clicks from initiating more timers
+	// all methods that need to be done every second need to go here
+		//updates the stats 
+		counter++;
+		getAllStats();
 		if (currentStats.length != 0){
 				//gets the graph data
 				getGraphData();
-				drawChart();
 		}
-			
+		
+		if(counter > 5){
+		counter = 0;
+			if(isRaceOn() == false){
+			stopGen = 1;
+			}
+		
 		}
-		else {
-			alert("Their appears to be no race on");
-		}
+		
+	
+	if(!stopGen) {
+       genTimer = setTimeout(function(){generation()},800)
+	   stopGen = 0;
 	}
+	}	
+
 	  
 	  
 	  
@@ -104,7 +136,7 @@ var lineCounter = 0;
 	function drawChart() {
 	 
 		// chart =  new google.visualization.LineChart(document.getElementById('visualization'));
-		chart.draw(data, options);
+		chart.draw(graphData, options);
 		}
 	
 //COMPARES THE TIME OF THE LAST TWO QUERIES TO SEE IF A RACE IS ON
@@ -116,7 +148,7 @@ var lineCounter = 0;
 			return true;
 		}
 		else{
-			return false
+			return false;
 		}
 	
 	}
@@ -140,15 +172,74 @@ var lineCounter = 0;
 		$.ajax({
 		dataType: "json",
 		url: "../v1.0/php/getStatsData.php",
-		async: false,
+		//async: false,
 		//data: dataString,
 		success: function(data) {
+
+		//sets the stats 
+		//sets the top six stats
+		//if (allStats == false){
 			document.getElementById("speedStat").innerHTML = data[0].speed;
+			document.getElementById("throttleStat").innerHTML = data[0].throttle;
+			document.getElementById("batteryStat").innerHTML = data[0].battery;
+			document.getElementById("batteryTempStat").innerHTML = data[0].batterytemp;
+			document.getElementById("airTempStat").innerHTML = data[0].airtemp;
+			document.getElementById("coolentTempStat").innerHTML = data[0].coolenttemp;
+		if (allStats == true){
+			document.getElementById("revStatFoot").innerHTML = data[0].rev;
+			document.getElementById("gearStatFoot").innerHTML = data[0].gear;
+			document.getElementById("speedStatFoot").innerHTML = data[0].speed;
+			document.getElementById("throttleStatFoot").innerHTML = data[0].throttle;
+			document.getElementById("FRrpmStatFoot").innerHTML = data[0].frrpm;
+			document.getElementById("FLrpmStatFoot").innerHTML = data[0].flrpm;
+			document.getElementById("RLrpmStatFoot").innerHTML = data[0].rlrpm;
+			document.getElementById("RRrpmStatFoot").innerHTML = data[0].rrrpm;
+			
+			document.getElementById("rpmStatFoot").innerHTML = data[0].rpm;
+			document.getElementById("airTempStatFoot").innerHTML = data[0].airtemp;
+			document.getElementById("coolentTempStatFoot").innerHTML = data[0].coolenttemp;
+			document.getElementById("lambdaStatFoot").innerHTML = data[0].lambda;
+			document.getElementById("suspen1StatFoot").innerHTML = data[0].suspen1;
+			
+			document.getElementById("suspen2StatFoot").innerHTML = data[0].suspen2;
+			document.getElementById("suspen3StatFoot").innerHTML = data[0].suspen3;
+			document.getElementById("suspen4StatFoot").innerHTML = data[0].suspen4;
+			document.getElementById("gForceXStatFoot").innerHTML = data[0].gforcex;
+			document.getElementById("gForceYStatFoot").innerHTML = data[0].gforcey;
+			document.getElementById("batteryStatFoot").innerHTML = data[0].battery;
+			document.getElementById("batteryTempStatFoot").innerHTML = data[0].batterytemp;
+			
+			
 		}
+		}
+		
 		})
 	
 	
 	}
+	
+//WORKS OUT IF A STAT IS IN AND ADDS IT TO IT (not in use)
+/**
+	function addStat(data){
+		//var keys = new Array();
+		//for 
+		var myJSONObject =  {"ircEvent": "PRIVMSG", "method": "newURI", "regex": "^http://.*"}; 
+var keys=[];
+for (var i in data[0]) { keys.push(i); }
+alert(keys[1]);
+document.getElementById("speedStat").innerHTML = data[0].keys[0];
+	}
+	
+	
+	var getKeys = function(data){
+   var keys = [];
+   for(var key in obj){
+      keys.push(key);
+   }
+   return keys;
+}
+**/
+
 
 //ADDS STATS TO THE GRAPH
 	function addAStat(statsName){
@@ -198,10 +289,14 @@ var lineCounter = 0;
 	}
 	
 	
+
+	
+	
+	
 	
 //GETS AN JSON OBJECT FOR THE STATS ON THE GRAPH 
-   function getGraphData()
-	 {	
+
+   function getGraphData() {	
 		if (currentStats.length != 0 ){
 		 jsonData = $.ajax({
         type: "GET",
@@ -209,19 +304,24 @@ var lineCounter = 0;
 		data: queryString,
 		dataType:"json",
         async: false,
-		success: function(data){
-		     
-            },
-			error: function(e){
-                console.log(e.message);
+		success: function(jsonData) {
             }
 		}).responseText;
 	//Converts the JSON object into useful graph data
-    data = new google.visualization.DataTable(jsonData);
-	
+    graphData = new google.visualization.DataTable(jsonData);
 	drawChart();
 	 
 	 }}
+	 
+	
+//WORKS OUT WHICH ARE THE TOP SIX STATS AND ADDS THEM TO THE ARRAY
+	function addTopSixStats(){
+		var placeHolder = document.getElementById('liveStats');
+		for (var i = 0; i < 6; i++){
+			 topSixStats[i] = placeHolder.children[i].children[1].id;
+		}
+		//alert(topSixStats[1]);
+	}
 	
 	
 	/**ADDS AND DELETES THE CURRENT STATS BEING ADDED TO THE GRAPH
@@ -304,23 +404,27 @@ $(document).ready(function(){
 			
 			$("header").click(function(){ $(this).slideUp(400); });
 			$('#up').click(function(){
-
+				
 				if ($("footer").is(":hidden")) {
+					//varable that works out if all stats should be shown
+					allStats = true;
+				
 					$("footer").show();
-
+				
 					var scrollAmount = $('footer').position().top;	
 
 					setTimeout(function(){ $('html, body').animate({scrollTop: scrollAmount}, 600); }, 100);
 
-					event.preventDefault(); 
+					//event.preventDefault(); 
 				} else {
+					allStats = false;
 					
 					$('html, body').animate({scrollTop: 0}, 600);
 					setTimeout(function(){ $("footer").hide(); }, 650);
 
-					event.preventDefault(); 
+					//event.preventDefault(); 
 				}
-
+				
 			});
 
 			$('.livestats section').click(function(){
