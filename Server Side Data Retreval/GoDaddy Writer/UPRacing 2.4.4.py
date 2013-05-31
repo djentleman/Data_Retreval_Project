@@ -185,7 +185,9 @@ def getTextFile(fileName):
         #return string for further formatting
         return inFileText
     except(Exception):
+        s.acquire()
         print("File Not Found")
+        s.release()
         return -1 #if -1 is returned, the program won't pass this stage
 
 
@@ -270,20 +272,11 @@ def runWriter(fileName):
     # repeat (delay between operations can be changed)
 
 def mkThreads(fileName):
-    t1 = WriterThread("A", fileName)
-    t2 = WriterThread("B", fileName)
-    t3 = WriterThread("C", fileName)
-    t4 = WriterThread("D", fileName)
-    t5 = WriterThread("E", fileName)
-    t6 = WriterThread("F", fileName)
-    t1.start()
-    t2.start()
-    t3.start()
-    t4.start()
-    t5.start()
-    t6.start()
-    # main thread works as interrupt handler
-    threads = [t1, t2, t3, t4, t5, t6]
+    threads = []
+    for i in range(8):
+        t = WriterThread(i, fileName)
+        t.start()
+        threads.append(t)
     waitForInterrupt(threads)
 
 def threadsAlive(threads):
@@ -299,7 +292,7 @@ def waitForInterrupt(threads):
     while True: # outer loop
         # this has O(n^2) efficency, slows down other threads
         # to save on cpu use, checks occur every 5 seconds
-        time.sleep(5)# timeout on outer loop
+        time.sleep(10)# timeout on outer loop
         if threadsAlive(threads) == False: ## if threads are dead OR user interrupt
             print("All Threads Dead")
             break
@@ -340,13 +333,13 @@ def getFileName():
     print("Enter The File Name Of The Serial Inputs:")
     fileName = input(">>>")
     ## possible regular expression check here
+    print("Extracting and pushing data from", fileName)
     return fileName
 
 
 def main():
     dumpSystemInfo()
     fileName = getFileName()
-    print("Extracting and pushing data from", fileName)
     menu(fileName)
 
 main()
