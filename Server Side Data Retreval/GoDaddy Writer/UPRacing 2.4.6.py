@@ -1,6 +1,6 @@
 ## Car Data Retreval Project
 ## Author: Todd Perry
-## Version 2.4.5
+## Version 2.4.6
 ## new sensors are here!
 ## lots of threads!
 ## writes to goDaddy!
@@ -26,7 +26,7 @@
 ##Throttle TEXT,
 ##CoolentTemp TEXT,
 ##Battery TEXT,
-##BatteryTemp TEXT,
+5##BatteryTemp TEXT,
 ##Lambda TEXT
 
 ## 21 pieces of data
@@ -117,9 +117,10 @@ class DataCache:
             cur.execute("DELETE FROM carStats") #remove current data
 
             for index in range(len(self.currentData)):
-                query = buildInsertQuery(self.currentData[index]) # cycle through cashe
-                cur.execute(query) #add new data
-                conn.commit()
+                if (self.currentData[index].isValid()):
+                    query = buildInsertQuery(self.currentData[index]) # cycle through cashe
+                    cur.execute(query) #add new data
+                    conn.commit()
 
 
             cur.close()
@@ -156,6 +157,13 @@ class CarData:
         for i in range(20):
             print(str(self.nameList[i]) + ": " + str(self.dataList[i]))
         print("--------------------------")
+
+    def isValid(self):
+        valid = True
+        for current in self.dataList:
+            # all values have to be 0 in order to be invalid
+            valid = valid and (current == 0)
+        return not valid
 
 
 
@@ -273,7 +281,7 @@ def runWriter(fileName):
 
 def mkThreads(fileName):
     threads = []
-    for i in range(8):
+    for i in range(5):
         t = WriterThread(i, fileName)
         t.start()
         threads.append(t)
@@ -321,12 +329,8 @@ def dumpSystemInfo():
     print("#          UPracing         #")
     print("# Car Data Retreval Project #")
     print("#     Author: Todd Perry    #")
-    print("#       Version 2.4.5       #")
+    print("#       Version 2.4.6       #")
     print("#############################")
-    print("")
-    print("NEW SENSORS ARE HERE!")
-    print("NOW WITH LOTS OF THREADS")
-    print("NOW WRITES TO GODADDY!!")
     print("")
 
 def getFileName():
