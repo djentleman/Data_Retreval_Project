@@ -26,7 +26,7 @@
 ##Throttle TEXT,
 ##CoolentTemp TEXT,
 ##Battery TEXT,
-5##BatteryTemp TEXT,
+##BatteryTemp TEXT,
 ##Lambda TEXT
 
 ## 21 pieces of data
@@ -73,37 +73,18 @@ class DataCache:
         # dataCache contains an arrat of carData, with a maximum size of 8
 
         blankCarData = CarData([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-
-        self.currentData = [blankCarData, blankCarData, blankCarData,
-                            blankCarData, blankCarData, blankCarData,
-                            blankCarData, blankCarData] # the array (initializes empty)
+        self.currentData = blankCarData # the array (initializes empty)
 
         # the cashe is the only attribute
 
 
     def printOut(self):
-        # Iterates through the cashe, prints all
-        if len(self.currentData) <= 0:
-            print("No Data In Cashe")
-        else:
-            for index in range(len(self.currentData)):
-                print("Car Data Object: " + str(index)) #title
-                print() # new line
-                self.currentData[index].printOut()
+            self.currentData.printOut()
 
 
     def addData(self, dataToAdd):
         # adds a new CarData to the cashe, dataToAdd is of type CarData
-        # 0 is newest item, 4 is oldest item
-
-
-
-        for index in range(len(self.currentData) - 1, 0, -1):
-            # start at len, end at 0
-            # doesn't grow
-            self.currentData[index] = self.currentData[index - 1] # shift up
-
-        self.currentData[0] = dataToAdd
+        self.currentData = dataToAdd
 
 
 
@@ -115,12 +96,12 @@ class DataCache:
             cur = conn.cursor()
 
             cur.execute("DELETE FROM carStats") #remove current data
+            #self.printOut()
 
-            for index in range(len(self.currentData)):
-                if (self.currentData[index].isValid()):
-                    query = buildInsertQuery(self.currentData[index]) # cycle through cashe
-                    cur.execute(query) #add new data
-                    conn.commit()
+            if (self.currentData.isValid()):
+                query = buildInsertQuery(self.currentData) # cycle through cashe
+                cur.execute(query) #add new data
+                conn.commit()
 
 
             cur.close()
