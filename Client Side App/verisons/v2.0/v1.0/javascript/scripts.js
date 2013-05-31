@@ -17,6 +17,7 @@ var queryString;
 
 var time = 0;
 var loadGraph = true;
+var fullScreen = false;
 
 //array for the current stats selected to be repesented on the graph
 var currentStats = new Array();
@@ -62,7 +63,7 @@ var lineCounter = 0;
                         colors: ['#5a2260', "red", "#acf", "#1BE032"],
                         legend: {position: 'top'},
                         hAxis: {title: 'Time'},
-                    	vAxis: {title: 'Speed',
+                    	vAxis: {title: 'Scaling',
 									viewWindow:{
 									min:0 }
 									},
@@ -70,13 +71,14 @@ var lineCounter = 0;
 						title: 'Real Time Stats',
 						animation:{
 						duration: 600,
-						easing: 'linear'
+						easing: 'inAndOut'
       }
    }
 	  
         // Create the graph
        chart =  new google.visualization.LineChart(document.getElementById('visualization'));
        chart.draw(graphData, options);
+	
       }
       
 	  // When the page first loads it creates the graph
@@ -84,8 +86,64 @@ var lineCounter = 0;
 	  
 //MY RANDOM TEST FUNCTION
  function test(){
-	//  alert("bpob");
+	//alert(screen.height);
+	//alert(screen.width);
 	  }
+	  
+//CHANGES THE GRAPH TO A BIGGER SIZE	  
+function changeGraphSize(){
+	if (fullScreen == false){
+	fullScreen = true;
+		options = {curveType: "function",
+            			backgroundColor: '#F8F8F8',
+                        width: screen.width, height: screen.height,
+                        colors: ['#5a2260', "red", "#acf", "#1BE032"],
+                        legend: {position: 'top'},
+                        hAxis: {title: 'Time'},
+                    	vAxis: {title: 'Scaling',
+									viewWindow:{
+									min:0 }
+									},
+						curveType: "function",
+						title: 'Real Time Stats',
+						animation:{
+						duration: 600,
+						easing: 'inAndOut'
+      }
+   }
+   document.getElementById("graph").style.height = (screen.height /100 * 80);
+   document.getElementById("graph").style.width = (screen.width / 100 * 80);
+   drawChart();
+   }
+   else {
+   fullScreen = false;
+		options = {curveType: "function",
+            			backgroundColor: '#F8F8F8',
+                        width: 320, height: 180,
+                        colors: ['#5a2260', "red", "#acf", "#1BE032"],
+                        legend: {position: 'top'},
+                        hAxis: {title: 'Time'},
+                    	vAxis: {title: 'Scaling',
+									viewWindow:{
+									min:0 }
+									},
+						curveType: "function",
+						title: 'Real Time Stats',
+						animation:{
+						duration: 600,
+						easing: 'inAndOut'
+      }
+   }
+   document.getElementById("graph").style.height = 180;
+   document.getElementById("graph").style.width = 320;
+   drawChart();
+   }
+   
+   
+   
+ 
+
+	}
 
 //WORKS OUT WHAT TO CALL AND DO  
  function main(){
@@ -219,7 +277,7 @@ var lineCounter = 0;
 		//data: dataString,
 		success: function(data) {
 		
-		
+		if (data[0] != null){
 		if (currentStats != 0){
 		
 		/**
@@ -240,7 +298,7 @@ var lineCounter = 0;
 		drawChart();
 		**/
 		//only load the graph every two cycles to make it the stats faster
-		if (loadGraph == true){
+		//if (loadGraph == true){
 			//checks the size of the graph
 		if(graphData.getNumberOfRows() >= 8){
 			graphData.removeRow(0);
@@ -282,11 +340,11 @@ var lineCounter = 0;
 		
 		graphData.addRows([rowToAdd[0]]);
 		drawChart();
-		loadGraph = false;
+		//loadGraph = false;
 		}
 		else {
-			loadGraph = true;
-		}}
+			//loadGraph = true;
+		}//}
 		
 		
 		
@@ -329,7 +387,7 @@ var lineCounter = 0;
 		}
 		}
 		
-		})
+		}})
 	
 	
 	 }

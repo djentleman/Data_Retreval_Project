@@ -78,6 +78,9 @@ header:hover{
 	width: 320px;
 	height: 180px;
 	background: #F8F8F8;
+	
+	
+	transition:1s;
 
 	-webkit-box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
 	   -moz-box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
