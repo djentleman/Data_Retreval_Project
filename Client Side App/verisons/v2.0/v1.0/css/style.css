@@ -80,12 +80,19 @@ header:hover{
 	background: #F8F8F8;
 	
 	
-	transition:1s;
+	transition: 1s;
+   -webkit-transition: 1s;
 
-	-webkit-box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
-	   -moz-box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
-			box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+	-webkit-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+	   -moz-box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
+			box-shadow: 0 0 0 1px rgba(0,0,0,0.05);
 }
+
+.graph:hover{
+	-webkit-box-shadow: 0 0 0 3px rgba(90, 34, 96, 0.4);
+	   -moz-box-shadow: 0 0 0 3px rgba(90, 34, 96, 0.4);
+			box-shadow: 0 0 0 3px rgba(90, 34, 96, 0.4);
+	}
 
 .livestats section{
 	cursor: pointer;

@@ -96,7 +96,7 @@ function changeGraphSize(){
 	fullScreen = true;
 		options = {curveType: "function",
             			backgroundColor: '#F8F8F8',
-                        width: screen.width, height: screen.height,
+                        width: (screen.width * 0.8 ), height: (screen.height * 0.8),
                         colors: ['#5a2260', "red", "#acf", "#1BE032"],
                         legend: {position: 'top'},
                         hAxis: {title: 'Time'},
@@ -111,8 +111,8 @@ function changeGraphSize(){
 						easing: 'inAndOut'
       }
    }
-   document.getElementById("graph").style.height = (screen.height /100 * 80);
-   document.getElementById("graph").style.width = (screen.width / 100 * 80);
+   document.getElementById("graph").style.height = (screen.height * 0.8);
+   document.getElementById("graph").style.width = (screen.width  * 0.8);
    drawChart();
    }
    else {
