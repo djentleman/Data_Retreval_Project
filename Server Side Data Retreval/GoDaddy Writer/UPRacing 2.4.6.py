@@ -296,14 +296,16 @@ def menu(fileName):
           print("press 1 to change the serial input file")
           print("press 2 to begin uploading to database")
           print("press 3 to exit")
-          choice = eval(input(">>>"))
-          if choice == 1:
+          choice = str(input(">>>"))
+          if choice == "1":
               fileName = getFileName()
-          elif choice == 2:
+          elif choice == "2":
               mkThreads(fileName)
               break
-          elif choice == 3:
+          elif choice == "3":
               exit()
+          else:
+              print("invalid input")
 
 def dumpSystemInfo():
     print("#############################")
