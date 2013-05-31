@@ -5,10 +5,10 @@
 	include "databaseLogIn.php";
 	
 	//Last time of the last query 
-	$query = "SELECT Time from CarStats ORDER BY Time DESC LIMIT 1";
+	$query = "SELECT EventID from CarStats ORDER BY Time DESC LIMIT 1";
 	$result = mysql_query($query);
 	
-	$lastQuery = mysql_result($result,0,"Time");
+	$lastQuery = mysql_result($result,0,"EventID");
 	echo $lastQuery;
 	
 	

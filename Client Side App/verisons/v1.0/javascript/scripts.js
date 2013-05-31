@@ -86,6 +86,7 @@ var lineCounter = 0;
 
 //WORKS OUT WHAT TO CALL AND DO  
  function main(){
+
 		//puts the top six stats into an array
 		addTopSixStats();
 		//if a race is on
@@ -109,10 +110,14 @@ var lineCounter = 0;
 		//updates the stats 
 		counter++;
 		getAllStats();
+		
+		/**
 		if (currentStats.length != 0){
 				//gets the graph data
 				getGraphData();
+			 
 		}
+		**/
 		
 		if(counter > 5){
 		counter = 0;
@@ -148,7 +153,7 @@ var lineCounter = 0;
 			return true;
 		}
 		else{
-			return false;
+			return true;
 		}
 	
 	}
@@ -165,6 +170,32 @@ var lineCounter = 0;
 	
 	}
 	
+//RETURNS A STAT IN THE CORRECT ORDER
+	function getWhichStat(statToReturn,json){
+		var tempStat;
+		if (statToReturn == "speed"){
+			tempStat = json.speed; 
+		}
+		else if (statToReturn == "throttle"){
+			tempStat = json.throttle;
+		}
+		else if (statToReturn == "battery"){
+			tempStat = json.battery;
+		}
+		else if (statToReturn == "batteryTemp"){
+			tempStat = json.batterytemp;
+		}
+		else if (statToReturn == "airTemp"){
+			tempStat = json.airtemp;
+		}
+		else if (statToReturn == "coolentTemp"){
+			tempStat = json.coolentemp;
+		}
+		
+		
+		return Number(tempStat); 
+	
+	}
 	
 //GETS ALL THE PAGE STATS AS A JSON OBJECT
 	function getAllStats(){
@@ -175,6 +206,62 @@ var lineCounter = 0;
 		//async: false,
 		//data: dataString,
 		success: function(data) {
+		
+		
+		if (currentStats != 0){
+		
+		/**
+		var bah = Number(data[0].speed);
+		//alert (typeof bah);
+		
+		//graphData = new google.visualization.DataTable();
+		//graphData.addColumn('string', 'Example Time'); 
+		//graphData.addColumn('number', 'Example Speed(sec)'); 
+		graphData.addRows([
+		['56',32],
+		['57', 46],
+		['58',  63],
+		['59', 63],
+		['60', bah]
+		]);	
+		
+		drawChart();
+		**/
+		
+		//checks the size of the graph
+			//checks the size of the graph
+		if(graphData.getNumberOfRows() >= 8){
+			graphData.removeRow(0);
+		}
+		
+		
+		//gets the correct stat for the size of the ones selected
+		var stat1 = getWhichStat(currentStats[0], data[0]);
+		var stat2 = getWhichStat(currentStats[1], data[0]);
+		var stat3 = getWhichStat(currentStats[2], data[0]);
+		var stat4 = getWhichStat(currentStats[3], data[0]);
+		var stat5 = getWhichStat(currentStats[4], data[0]);
+		var stat6 = getWhichStat(currentStats[5], data[0]);
+		//alert(graphData.getNumberOfColumns());
+		//alert(stat1);
+		//alert(currentStats.length);
+		var length = currentStats.length;
+		//works out the size of the row
+		if (length == 1){
+			graphData.addRows([['62',stat1]]);
+		}
+		else if (length == 2){
+			graphData.addRows([['60',stat1, stat2]]);
+		}
+		
+		
+		drawChart();
+		
+		}
+		
+		
+		
+		
 
 		//sets the stats 
 		//sets the top six stats
@@ -251,6 +338,20 @@ document.getElementById("speedStat").innerHTML = data[0].keys[0];
 		}
 		else {
 			currentStats.push(statsName);
+				//if the length of one it needs to build the graph data
+		if((length +1) == 1){
+			graphData = new google.visualization.DataTable();
+			graphData.addColumn('string', 'Time'); 
+			graphData.addColumn('number', currentStats[0]); 
+			alert("new:" + graphData.getNumberOfColumns());
+		
+		}
+		else {
+			graphData.addColumn('number', currentStats[length -1]);
+		}
+			
+			
+			
 			updateQueryString()
 			//alert(currentStats[length]);
 		}
@@ -273,7 +374,11 @@ document.getElementById("speedStat").innerHTML = data[0].keys[0];
 	function updateQueryString(){
 		var length = currentStats.length;
 		queryString = "";
+		
 		if (length != 0){
+		
+		
+			//builds the query string
 			queryString = "stat1=" + currentStats[0];
 			for(var i = 1; i < length; i++){
 			queryString += ("&stat" + (i + 1) + "=" + currentStats[i]);
@@ -307,8 +412,10 @@ document.getElementById("speedStat").innerHTML = data[0].keys[0];
 		success: function(jsonData) {
             }
 		}).responseText;
+		
+		//alert(jsonData);
 	//Converts the JSON object into useful graph data
-    graphData = new google.visualization.DataTable(jsonData);
+   graphData = new google.visualization.DataTable(jsonData);
 	drawChart();
 	 
 	 }}
