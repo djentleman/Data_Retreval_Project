@@ -1,6 +1,6 @@
 ## Car Data Retreval Project
 ## Author: Todd Perry
-## Version 2.4.4
+## Version 2.4.5
 ## new sensors are here!
 ## lots of threads!
 ## writes to goDaddy!
@@ -55,7 +55,7 @@ class WriterThread(Thread): # thread represented as an object
         while True:
             s.acquire()
             # critical section
-            print("Thread", self.name, "Has Uploaded")
+            #print("Thread", self.name, "Has Uploaded")
             s.release()
             crashFlag = runWriter(self.fileName)
             if crashFlag:
@@ -251,40 +251,6 @@ def buildInsertQuery(carData):
 
     return query
 
-
-
-def databaseSetup():
-    try:
-        conn = pymysql.connect(host='upStatsAPPV2.db.9980564.hostedresource.com', port=3306, user='upStatsAPPV2', passwd='Southsea2#', db='upStatsAPPV2') # test DEFINATLEY exists
-        cur = conn.cursor()
-
-        cur.execute("CREATE DATABASE IF NOT EXISTS upStatsAPP") # DB name is now upStatsAPP
-
-        cur.close()
-        conn.close() # close test
-
-        conn = pymysql.connect(host='upStatsAPPV2.db.9980564.hostedresource.com', port=3306, user='upStatsAPPV2', passwd='Southsea2#', db='upStatsAPPV2') # test DEFINATLEY exists
-        cur = conn.cursor() # open the 'newly created' upStatsAPP
-
-
-        cur.execute("DROP TABLE IF EXISTS CarStats")
-        cur.execute("CREATE TABLE IF NOT EXISTS CarStats(" +
-                    "EventID TEXT, Rev TEXT, Gear TEXT, RPM TEXT, " +
-                    "Speed TEXT,  FRrpm TEXT, FLrpm TEXT, " +
-                    "RRrp TEXT, RLrpm TEXT, Suspension1 TEXT, " +
-                    "Suspension2 TEXT, Suspension3 TEXT, Suspension4 TEXT, GForceX TEXT, " +
-                    "GForceY TEXT, AirTemp TEXT, Throttle TEXT, " +
-                    "CoolentTemp TEXT, Battery TEXT, BatteryTemp TEXT, " +
-                    "Lambda TEXT)") #SQL query for table setup
-
-        print("Database Reset Successful")
-
-        cur.close()
-        conn.close()
-    except (Exception):
-        print("Database Did Not Reset, Something Went Wrong")
-
-
 def runWriter(fileName):
     dataCache = DataCache()
     rawData = getTextFile(fileName)
@@ -345,12 +311,12 @@ def waitForInterrupt(threads):
 
 def menu(fileName):
       while True:
-          print("press 1 to set up database")
+          print("press 1 to change the serial input file")
           print("press 2 to begin uploading to database")
           print("press 3 to exit")
           choice = eval(input(">>>"))
           if choice == 1:
-              databaseSetup()
+              fileName = getFileName()
           elif choice == 2:
               mkThreads(fileName)
               break
@@ -362,13 +328,12 @@ def dumpSystemInfo():
     print("#          UPracing         #")
     print("# Car Data Retreval Project #")
     print("#     Author: Todd Perry    #")
-    print("#       Version 2.4.4       #")
+    print("#       Version 2.4.5       #")
     print("#############################")
     print("")
     print("NEW SENSORS ARE HERE!")
     print("NOW WITH LOTS OF THREADS")
     print("NOW WRITES TO GODADDY!!")
-    print("")
     print("")
 
 def getFileName():
