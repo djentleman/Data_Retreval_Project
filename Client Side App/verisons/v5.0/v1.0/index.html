@@ -1,0 +1,104 @@
+<html>
+<head>
+	<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;">
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<meta names="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+	<title>UPR - Stats</title>
+
+	<link rel="shortcut icon" href="img/purp.ico" />
+	<link href="css/style.css" rel="stylesheet" type="text/css" />
+	<link rel="apple-touch-icon-precomposed" href="img/icon.png" />
+	<link rel="apple-touch-startup-image" href="img/startup.png">
+
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+	<script type="text/javascript" src="http://www.google.com/jsapi"></script>
+	<script type="text/javascript" src="javascript/scripts.js"></script> 
+	 
+	<!-- <script type="text/javascript" src="j/jquery-1.9.0.min.js"></script> -->
+	<body onload="main()">
+</head>
+<body>
+
+	<header>
+		<h1>Car Statistics</h1>
+	</header>
+
+	<section class="graph"  onclick = "changeGraphSize()" id = "graph">
+		<div id="visualization"></div>
+	</section>
+	
+	<div class ="message" id="message"> </div>
+	
+ <!-- <button onclick ='try{changeOnPageStats()}catch(e){alert(e)}' type="button" id = "tempButton" >testing!</button> -->
+	
+	<section id = "liveStats" class="livestats">		
+
+		<section id ="speed">
+			<h2>Speed</h2>
+			<p id ="speedStat" >300</p>
+		</section>
+
+		<section id ="throttle">
+			<h2>Throttle </h2>
+			<p id ="throttleStat">123</p>
+		</section>		
+
+		<section id ="battery">
+			<h2>Battery &#37;</h2>
+			<p id ="batteryStat">70</p>
+		</section>
+
+		<section id ="batteryTemp">
+			<h2>Battery Temp &deg;C</h2>
+			<p id ="batteryTempStat">67</p>
+		</section>
+
+		<section id ="airTemp">
+			<h2> Air Temp &deg;C</h2>
+			<p id ="airTempStat">12</p>
+		</section>
+
+		<section id ="coolentTemp">
+			<h2>Coolent Temp &deg;C</h2>
+			<p id ="coolentTempStat">55</p>
+		</section>
+
+	</section>
+
+	<section id="up"></section>
+
+	<footer>
+		<ul>
+			<li>Rev <p id = "revStatFoot" >   </p> </li>
+			<li>Gear <p id = "gearStatFoot">  </p> </li>
+			<li>Speed <p id = "speedStatFoot">  </p></li>
+			<li>Throttle <p id = "throttleStatFoot">  </p></li>
+
+			<li>Front Right Wheel RPM <p id = "FRrpmStatFoot">  </p></li>
+			<li>Front Left Wheel RPM <p id = "FLrpmStatFoot">  </p></li>
+			<li>Rear Right Wheel RPM <p id = "RRrpmStatFoot">  </p></li>
+			<li>Rear Left Wheel RPM <p id = "RLrpmStatFoot">  </p></li>
+			
+			<li>RPM <p id = "rpmStatFoot">  </p> </li>
+			<li>Air Temp &deg;C <p id = "airTempStatFoot">  </p></li>		
+			<li>Coolent Temp &deg;C <p id = "coolentTempStatFoot">  </p></li>
+			<li>Lambda <p id = "lambdaStatFoot">  </p></li>
+			
+			<li>Suspension1 <p id = "suspen1StatFoot">  </p></li>
+			<li>Suspension2 <p id = "suspen2StatFoot">  </p></li>
+			<li>Suspension3 <p id = "suspen3StatFoot">  </p></li>
+			<li>Suspension4 <p id = "suspen4StatFoot">  </p></li>
+
+			<li>G-Force X <p id = "gForceXStatFoot">  </p></li>
+			<li>G-Force Y <p id = "gForceYStatFoot">  </p></li>
+			<li>Battery &#37; <p id = "batteryStatFoot">  </p></li>
+			<li>Battery Temp &deg;C <p id = "batteryTempStatFoot">  </p></li>
+			
+			
+			
+		</ul>
+	</footer>
+
+</body>
+</html>
