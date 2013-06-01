@@ -1,6 +1,7 @@
 ## Car Data Retreval Project
 ## Author: Todd Perry
-## Version 2.4.6
+## Version 2.4.6.1
+## Python 2.7 Ready
 ## new sensors are here!
 ## lots of threads!
 ## writes to goDaddy!
@@ -66,8 +67,8 @@ class WriterThread(Thread): # thread represented as an object
         return
 
 class DataCache:
-    # the dataCache aggregates carData, and contains an array of current data
-    # has a print method
+    # the dataCache aggregates carData
+    # effectivley a carData that can write to the database
 
     def __init__(self):
         # dataCache contains an arrat of carData, with a maximum size of 8
@@ -292,33 +293,33 @@ def waitForInterrupt(threads):
     return
 
 def menu(fileName):
-      while True:
-          print("press 1 to change the serial input file")
-          print("press 2 to begin uploading to database")
-          print("press 3 to exit")
-          choice = str(input(">>>"))
-          if choice == "1":
-              fileName = getFileName()
-          elif choice == "2":
-              mkThreads(fileName)
-              break
-          elif choice == "3":
-              exit()
-          else:
-              print("invalid input")
+    while True:
+        print("press 1 to change the serial input file")
+        print("press 2 to begin uploading to database")
+        print("press 3 to exit")
+        choice = str(input(">>>"))
+        if choice == "1":
+            fileName = getFileName()
+        elif choice == "2":
+            mkThreads(fileName)
+            break
+        elif choice == "3":
+            exit()
+        else:
+            print("invalid input")
 
 def dumpSystemInfo():
     print("#############################")
     print("#          UPracing         #")
     print("# Car Data Retreval Project #")
     print("#     Author: Todd Perry    #")
-    print("#       Version 2.4.6       #")
+    print("#      Version 2.4.6.1      #")
     print("#############################")
-    print("")
+    print("Python 2.7 Compatible Version")
 
 def getFileName():
     print("Enter The File Name Of The Serial Inputs:")
-    fileName = input(">>>")
+    fileName = str(input(">>>"))
     ## possible regular expression check here
     print("Extracting and pushing data from", fileName)
     return fileName
